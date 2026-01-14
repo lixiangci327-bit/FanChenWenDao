@@ -2,12 +2,7 @@ package net.Lcing.fanchenwendao;
 
 import net.Lcing.fanchenwendao.client.animation.FCAnimations;
 import net.Lcing.fanchenwendao.event.CommonEventHandler;
-import net.Lcing.fanchenwendao.registry.ModNetwork;
-
-import net.Lcing.fanchenwendao.registry.ModEntities;
-import net.Lcing.fanchenwendao.registry.ModCreativeModeTabs;
-import net.Lcing.fanchenwendao.registry.ModItems;
-import net.Lcing.fanchenwendao.registry.ModAttachments;
+import net.Lcing.fanchenwendao.registry.*;
 
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import org.slf4j.Logger;
@@ -53,9 +48,9 @@ public class FanChenWenDao {
         ModItems.register(modEventBus);
         ModEntities.register(modEventBus);
         ModAttachments.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
 
-        // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
+
         //注册动画事件
         modEventBus.addListener(FCAnimations::registerAnimations);
 
@@ -72,13 +67,6 @@ public class FanChenWenDao {
 
     }
 
-    // Add the example block item to the building blocks tab
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
-
-        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-            event.accept(ModItems.YINQIJUE);
-        }
-    }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent

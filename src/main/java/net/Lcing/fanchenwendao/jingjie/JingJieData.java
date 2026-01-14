@@ -1,0 +1,98 @@
+package net.Lcing.fanchenwendao.jingjie;
+
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+
+
+//境界数据类——存储玩家的修仙境界信息
+public class JingJieData implements INBTSerializable<CompoundTag> {
+
+    //存储境界等级
+    private int level;
+    private float experience;//修为
+
+    //默认构造函数：玩家刚生成时为0
+    public JingJieData() {
+        this.level = 0;
+        this.experience = 0;
+    }
+
+    //带参数的构造函数，由Codec使用
+    public JingJieData(int level, float experience) {
+        this.level = level;
+        this.experience = experience;
+    }
+
+    //获取数据
+    public int getLevel() {
+        return level;
+    }
+
+    public float getExperience() {
+        return experience;
+    }
+
+    //设置数据
+    public void setLevel(int level) {
+        this.level = Math.max(0, Math.min(level, 15));
+    }
+
+    public void setExperience(float experience) {
+        this.experience = Math.max(0, experience);
+    }
+
+    public void addExperience(float amount) {
+        this.experience += amount;
+    }
+
+    //计算升级所需的修为
+    public float getMaxExperience() {
+        if (level == 0 ) return 100.0f;//凡人到凝气一层
+        return (float) (100.0 * Math.pow(1.5, level));
+    }
+
+    //升级方法
+    public void levelUp() {
+        setLevel(level + 1);
+        setExperience(0);//升级后的修为，目前暂定为0，后续改为溢出值，以及连续破境的逻辑
+    }
+
+    //Codec jingjiedata - int 相互转换
+    public static final Codec<JingJieData> CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(
+                    Codec.INT.fieldOf("level").forGetter(JingJieData::getLevel),
+                    Codec.FLOAT.optionalFieldOf("experience", 0.0f).forGetter(JingJieData::getExperience)
+            ).apply(instance, JingJieData::new)
+    );
+
+    //NBT读写
+    @Override
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        //保存NBT：创建一个新的标签，放入level
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("level", this.level);
+        tag.putFloat("experience", this.experience);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        //读取NBT：从NBT标签tag里面拿出level赋值给当前对象
+        if (tag.contains("level")) {
+            this.level = tag.getInt("level");
+        }
+        if (tag.contains("experience")) {
+            this.experience = tag.getFloat("experience");
+        }
+    }
+
+    //debug
+    @Override
+    public String toString() {
+        return "JingJieData{level=" + level + ", exp=" + experience + "}";
+    }
+}

@@ -1,13 +1,18 @@
 package net.Lcing.fanchenwendao.client;
 
+import com.lowdragmc.lowdraglib2.gui.holder.ModularUIContainerMenu;
+import com.lowdragmc.lowdraglib2.gui.holder.ModularUIContainerScreen;
 import net.Lcing.fanchenwendao.FanChenWenDao;
 import net.Lcing.fanchenwendao.client.renderer.entity.ThrownSwordRenderer;
+import net.Lcing.fanchenwendao.client.ui.screen.PlayerPanelScreen;
 import net.Lcing.fanchenwendao.registry.ModEntities;
+import net.Lcing.fanchenwendao.registry.ModMenuTypes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -39,6 +44,16 @@ public class FanChenWenDaoClient {
         //监听渲染器注册事件
         modEventBus.addListener(this::registerRenderers);
 
+        //Menu -> Screen
+        modEventBus.addListener(this::registerScreens);
+
+    }
+
+    private void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(
+                ModMenuTypes.PLAYER_PANEL_MENU.get(),
+                PlayerPanelScreen::new
+        );
     }
 
 
