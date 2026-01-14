@@ -14,17 +14,20 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
     //存储境界等级
     private int level;
     private float experience;//修为
+    private float lingli;   //灵力
 
     //默认构造函数：玩家刚生成时为0
     public JingJieData() {
         this.level = 0;
         this.experience = 0;
+        this.lingli = 0;
     }
 
     //带参数的构造函数，由Codec使用
-    public JingJieData(int level, float experience) {
+    public JingJieData(int level, float experience, float lingli) {
         this.level = level;
         this.experience = experience;
+        this.lingli = lingli;
     }
 
     //获取数据
@@ -36,6 +39,12 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         return experience;
     }
 
+    public float getLingli() {
+        return lingli;
+    }
+
+
+
     //设置数据
     public void setLevel(int level) {
         this.level = Math.max(0, Math.min(level, 15));
@@ -45,8 +54,22 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         this.experience = Math.max(0, experience);
     }
 
+    public void setLingli(float lingli) {
+        this.lingli = Math.max(0, lingli);  //防止灵力为复数
+    }
+
+
+
+
     public void addExperience(float amount) {
         this.experience += amount;
+    }
+
+    public void addLingli(float amount) {
+        this.lingli += amount;
+        if (this.lingli < 0) {
+            this.lingli = 0;    //防止为负数
+        }
     }
 
     //计算升级所需的修为
@@ -61,11 +84,15 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         setExperience(0);//升级后的修为，目前暂定为0，后续改为溢出值，以及连续破境的逻辑
     }
 
+
+
+
     //Codec jingjiedata - int 相互转换
     public static final Codec<JingJieData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.INT.fieldOf("level").forGetter(JingJieData::getLevel),
-                    Codec.FLOAT.optionalFieldOf("experience", 0.0f).forGetter(JingJieData::getExperience)
+                    Codec.FLOAT.optionalFieldOf("experience", 0.0f).forGetter(JingJieData::getExperience),
+                    Codec.FLOAT.optionalFieldOf("lingli", 0.0f).forGetter(JingJieData::getLingli)
             ).apply(instance, JingJieData::new)
     );
 
@@ -76,6 +103,7 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         CompoundTag tag = new CompoundTag();
         tag.putInt("level", this.level);
         tag.putFloat("experience", this.experience);
+        tag.putFloat("lingli", this.lingli);
         return tag;
     }
 
@@ -87,6 +115,9 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         }
         if (tag.contains("experience")) {
             this.experience = tag.getFloat("experience");
+        }
+        if (tag.contains("lingli")) {
+            this.lingli = tag.getFloat("lingli");
         }
     }
 

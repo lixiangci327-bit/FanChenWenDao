@@ -15,6 +15,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import org.joml.Quaternionf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,6 +67,8 @@ public class PersistentFXHandler {
                         BoneExecutor exector = new BoneExecutor(
                                 fx, player.level(), player, joint, true //true-跟随旋转
                         );
+
+
                         exector.start();
 
                         executors.add(exector);

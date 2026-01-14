@@ -20,6 +20,15 @@ public class JingJieHelper {
         return player.getData(ModAttachments.JINGJIE_DATA).getExperience();
     }
 
+    //获取灵力
+    public static float getLingli(ServerPlayer player) {
+        return player.getData(ModAttachments.JINGJIE_DATA).getLingli();
+    }
+
+
+
+
+
     //设置玩家的境界，并且自动同步
     public static void setLevel(ServerPlayer player, int level) {
         //获取数据附件
@@ -39,14 +48,14 @@ public class JingJieHelper {
 
         //检查是否满足升级条件 （简单逻辑，后续引入突破概率、必须条件、隐藏彩蛋）
         if (data.getExperience() >= data.getMaxExperience()) {
-            levelup(player);
+            Levelup(player);
         } else {
             syncToClient(player);//未升级也要同步修为
         }
     }
 
     //提升境界
-    public static int levelup(ServerPlayer player) {
+    public static int Levelup(ServerPlayer player) {
         JingJieData data = player.getData(ModAttachments.JINGJIE_DATA);
 
         //执行升级逻辑
@@ -59,12 +68,28 @@ public class JingJieHelper {
         return data.getLevel();
     }
 
+    //设置灵力并同步
+    public static void setLingli(ServerPlayer player, float amount) {
+        JingJieData data = player.getData(ModAttachments.JINGJIE_DATA);
+        data.setLingli(amount);
+        syncToClient(player);
+    }
+
+
+
+
+
     //负责发包的私有方法
     public static void syncToClient(ServerPlayer player) {
         JingJieData data = player.getData(ModAttachments.JINGJIE_DATA);
 
         //创建包
-        SyncJingJiePayload payload = new SyncJingJiePayload(player.getId(), data.getLevel(), data.getExperience());
+        SyncJingJiePayload payload = new SyncJingJiePayload(
+                player.getId(),
+                data.getLevel(),
+                data.getExperience(),
+                data.getLingli()
+        );
 
         //发送数据包
         PacketDistributor.sendToPlayer(player, payload);

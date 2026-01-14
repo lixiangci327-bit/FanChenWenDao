@@ -13,7 +13,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record SyncJingJiePayload(int entityId, int level, float experience) implements CustomPacketPayload {
+public record SyncJingJiePayload(int entityId, int level, float experience, float lingli) implements CustomPacketPayload {
 
     //定义Type
     public static final Type<SyncJingJiePayload> TYPE = new Type<>(
@@ -25,6 +25,7 @@ public record SyncJingJiePayload(int entityId, int level, float experience) impl
             ByteBufCodecs.INT, SyncJingJiePayload::entityId,//读写Id
             ByteBufCodecs.INT, SyncJingJiePayload::level,
             ByteBufCodecs.FLOAT, SyncJingJiePayload::experience,
+            ByteBufCodecs.FLOAT, SyncJingJiePayload::lingli,
             SyncJingJiePayload::new
     );
 
@@ -47,6 +48,7 @@ public record SyncJingJiePayload(int entityId, int level, float experience) impl
                     //更新收到的新数据
                     data.setLevel(payload.level());
                     data.setExperience(payload.experience());
+                    data.setLingli(payload.lingli());
                 }
             }
         });

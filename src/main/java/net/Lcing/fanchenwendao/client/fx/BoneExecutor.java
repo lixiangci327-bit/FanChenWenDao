@@ -24,6 +24,8 @@ public class BoneExecutor extends FXEffectExecutor {
     private final String jointName;
     private final boolean followRotation;
 
+
+
     //构造函数
     public BoneExecutor(FX fx, Level level, LivingEntity entity, String jointName, boolean followRotation) {
         super(fx, level);
@@ -44,6 +46,7 @@ public class BoneExecutor extends FXEffectExecutor {
 
         this.runtime.emmit(this, delay);
     }
+
 
     @Override
     public void updateFXObjectFrame(IFXObject fxObject, float partialTicks) {
@@ -114,6 +117,7 @@ public class BoneExecutor extends FXEffectExecutor {
             //转换EF矩阵->JOML四元数
             OpenMatrix4f worldMatrix = modelTransform.mulFront(entityRotationMatrix);
 
+            //wordlRot是骨骼当前在世界里的朝向
             Quaternionf worldRot = worldMatrix.toQuaternion();
 
             runtime.root.updateRotation(worldRot.mul(this.rotation));

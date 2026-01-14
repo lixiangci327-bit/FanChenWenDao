@@ -5,7 +5,6 @@ package net.Lcing.fanchenwendao.jingjie;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -51,7 +50,7 @@ public class JingJieCommand {
             ServerPlayer player = context.getSource().getPlayerOrException();
 
             //调用helper的levelup方法
-            int newlevel = JingJieHelper.levelup(player);
+            int newlevel = JingJieHelper.Levelup(player);
 
             context.getSource().sendSuccess(() -> Component.literal("境界提升成功，当前境界为：" + newlevel + "层"), true);
 
