@@ -21,6 +21,7 @@ public class ModCreativeModeTabs {
                     .title(Component.translatable("creativetab.fanchenwendao.gongfa"))
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.YINQIJUE.get());
+                        output.accept(ModItems.LINGQI_DETECTOR.get());
 
 
                     }).build());

@@ -3,6 +3,7 @@ package net.Lcing.fanchenwendao.registry;
 import net.Lcing.fanchenwendao.FanChenWenDao;
 import net.Lcing.fanchenwendao.fashu.FashuData;
 import net.Lcing.fanchenwendao.jingjie.JingJieData;
+import net.Lcing.fanchenwendao.lingqisystem.LingQiChunkData;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -16,11 +17,13 @@ public class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister
             .create(NeoForgeRegistries.ATTACHMENT_TYPES, FanChenWenDao.MODID);
 
+
+
     //法术数据
     public static final Supplier<AttachmentType<FashuData>> FASHU_DATA = ATTACHMENT_TYPES.register(
             "fashu_data",
             () -> AttachmentType.<FashuData>builder(() -> new FashuData())
-                    .serialize(FashuData.CEDEC)
+                    .serialize(FashuData.CODEC)
                     .copyOnDeath()
                     .build()
     );
@@ -31,6 +34,14 @@ public class ModAttachments {
             () -> AttachmentType.<JingJieData>builder(() -> new JingJieData())
                     .serialize(JingJieData.CODEC)//告诉游戏怎么保存数据Codec
                     .copyOnDeath()//死亡后复制
+                    .build()
+    );
+
+    //灵气区块数据
+    public static final Supplier<AttachmentType<LingQiChunkData>> LINGQI_CHUNK_DATA = ATTACHMENT_TYPES.register(
+            "lingqi_chunk_data",
+            () -> AttachmentType.<LingQiChunkData>builder(() -> new LingQiChunkData())
+                    .serialize(LingQiChunkData.CODEC)
                     .build()
     );
 

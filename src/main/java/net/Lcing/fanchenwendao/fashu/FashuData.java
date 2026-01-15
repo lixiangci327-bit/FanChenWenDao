@@ -19,7 +19,7 @@ public class FashuData implements INBTSerializable<CompoundTag> {
 
 
     //定义Codec
-    public static final Codec<FashuData> CEDEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final Codec<FashuData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             //定义要保存的字段
             Codec.INT.fieldOf("CurrentFashu").forGetter(d -> d.currentFashu.getId())
     ).apply(instance, (id) -> {

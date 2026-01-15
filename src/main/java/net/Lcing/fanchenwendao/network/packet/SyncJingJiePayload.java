@@ -13,7 +13,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record SyncJingJiePayload(int entityId, int level, float experience, float lingli) implements CustomPacketPayload {
+public record SyncJingJiePayload(int entityId, int level, float experience, float lingli, boolean isXiulian, String mainGongFaName) implements CustomPacketPayload {
 
     //定义Type
     public static final Type<SyncJingJiePayload> TYPE = new Type<>(
@@ -26,6 +26,8 @@ public record SyncJingJiePayload(int entityId, int level, float experience, floa
             ByteBufCodecs.INT, SyncJingJiePayload::level,
             ByteBufCodecs.FLOAT, SyncJingJiePayload::experience,
             ByteBufCodecs.FLOAT, SyncJingJiePayload::lingli,
+            ByteBufCodecs.BOOL, SyncJingJiePayload::isXiulian,
+            ByteBufCodecs.STRING_UTF8, SyncJingJiePayload::mainGongFaName,
             SyncJingJiePayload::new
     );
 
@@ -49,6 +51,8 @@ public record SyncJingJiePayload(int entityId, int level, float experience, floa
                     data.setLevel(payload.level());
                     data.setExperience(payload.experience());
                     data.setLingli(payload.lingli());
+                    data.setXiulian(payload.isXiulian());
+                    data.setMainGongFaName(payload.mainGongFaName());
                 }
             }
         });

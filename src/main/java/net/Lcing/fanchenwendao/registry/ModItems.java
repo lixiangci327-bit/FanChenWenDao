@@ -2,6 +2,7 @@ package net.Lcing.fanchenwendao.registry;
 
 import net.Lcing.fanchenwendao.FanChenWenDao;
 import net.Lcing.fanchenwendao.item.YinQiJueItem;
+import net.Lcing.fanchenwendao.lingqisystem.item.LingQiDetectorItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -12,6 +13,12 @@ public class ModItems {
 
     public static final DeferredItem<Item> YINQIJUE = ITEMS.register("yinqijue",
             () -> new YinQiJueItem(new Item.Properties()));
+
+    //灵气探测器
+    public static final DeferredItem<LingQiDetectorItem> LINGQI_DETECTOR = ITEMS.register(
+            "lingqi_detector",
+            LingQiDetectorItem::new
+    );
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

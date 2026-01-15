@@ -1,13 +1,24 @@
 {
   "item.fanchenwendao.yinqijue": "引气诀",
-  "jingjie.mortal": "凡人",
-  "jingjie.ning_qi": "凝气期",
-  "jingjie.zhu_ji": "筑基期",
-  "jingjie.jie_dan": "结丹期",
-  "jingjie.yuan_ying": "元婴期",
-  "jingjie.hua_shen": "化神期",
-  "jingjie.ying_bian": "婴变期",
-  "jingjie.wen_ding": "问鼎期",
-  "jingjie.yin_xu": "阴虚",
-  "jingjie.yang_shi": "阳实"
+  "item.fanchenwendao.lingqi_detector": "灵气探测器",
+
+  "fanchenwendao.jingjie.0": "凡人",
+  "fanchenwendao.jingjie.1": "凝气一层",
+  "fanchenwendao.jingjie.2": "凝气二层",
+  "fanchenwendao.jingjie.3": "凝气三层",
+  "fanchenwendao.jingjie.4": "凝气四层",
+  "fanchenwendao.jingjie.5": "凝气五层",
+  "fanchenwendao.jingjie.6": "凝气六层",
+  "fanchenwendao.jingjie.7": "凝气七层",
+  "fanchenwendao.jingjie.8": "凝气八层",
+  "fanchenwendao.jingjie.9": "凝气九层",
+  "fanchenwendao.jingjie.10": "凝气十层",
+  "fanchenwendao.jingjie.11": "凝气十一层",
+  "fanchenwendao.jingjie.12": "凝气十二层",
+  "fanchenwendao.jingjie.13": "凝气十三层",
+  "fanchenwendao.jingjie.14": "凝气十四层",
+  "fanchenwendao.jingjie.15": "凝气大圆满",
+  "fanchenwendao.jingjie.16": "筑基初期",
+
+  "fanchenwendao.message.levelup": "§e[修仙]§r 恭喜道友突破至 %s ！"
 }

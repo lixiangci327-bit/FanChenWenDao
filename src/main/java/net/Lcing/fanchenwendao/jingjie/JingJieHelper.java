@@ -3,6 +3,7 @@ package net.Lcing.fanchenwendao.jingjie;
 
 import net.Lcing.fanchenwendao.network.packet.SyncJingJiePayload;
 import net.Lcing.fanchenwendao.registry.ModAttachments;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -25,9 +26,25 @@ public class JingJieHelper {
         return player.getData(ModAttachments.JINGJIE_DATA).getLingli();
     }
 
+    //是否在修炼
+    public static boolean isXiulian(ServerPlayer player) {
+        return player.getData(ModAttachments.JINGJIE_DATA).isXiulian();
+    }
+
+    //获取当前功法
+    public static String getMainGongFaName(ServerPlayer player) {
+        return player.getData(ModAttachments.JINGJIE_DATA).getMainGongFaName();
+    }
 
 
 
+
+
+    //境界名称本地化
+    public static Component getJingJieName(int level) {
+        String key = "fanchenwendao.jingjie." + level;
+        return Component.translatable(key);
+    }
 
     //设置玩家的境界，并且自动同步
     public static void setLevel(ServerPlayer player, int level) {
@@ -61,6 +78,9 @@ public class JingJieHelper {
         //执行升级逻辑
         data.levelUp();
 
+        Component jingjiename = getJingJieName(data.getLevel());
+        player.sendSystemMessage(Component.translatable("fanchenwendao.message.levelup", jingjiename));
+
         //同步
         syncToClient(player);
         //TODO 添加音效、粒子等
@@ -73,6 +93,16 @@ public class JingJieHelper {
         JingJieData data = player.getData(ModAttachments.JINGJIE_DATA);
         data.setLingli(amount);
         syncToClient(player);
+    }
+
+    //设置修炼状态
+    public static void setXiulian(ServerPlayer player, boolean xiulian) {
+        JingJieData data = player.getData(ModAttachments.JINGJIE_DATA);
+        //如果状态没变则不发包
+        if (data.isXiulian() != xiulian) {
+            data.setXiulian(xiulian);
+            syncToClient(player);
+        }
     }
 
 
@@ -88,7 +118,9 @@ public class JingJieHelper {
                 player.getId(),
                 data.getLevel(),
                 data.getExperience(),
-                data.getLingli()
+                data.getLingli(),
+                data.isXiulian(),
+                data.getMainGongFaName()
         );
 
         //发送数据包
