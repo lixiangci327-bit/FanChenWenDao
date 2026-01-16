@@ -4,6 +4,7 @@ package net.Lcing.fanchenwendao.jingjie;
 import net.Lcing.fanchenwendao.FanChenWenDao;
 import net.Lcing.fanchenwendao.gongfa.GongFaLevel;
 import net.Lcing.fanchenwendao.lingqisystem.LingQiChunkData;
+import net.Lcing.fanchenwendao.lingqisystem.LingQiHelper;
 import net.Lcing.fanchenwendao.registry.ModAttachments;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -44,8 +45,7 @@ public class XiuLianTickHandler {
 
         //获取环境数据
         ServerLevel level = (ServerLevel) player.level();
-        LevelChunk chunk = level.getChunkAt(player.blockPosition());
-        LingQiChunkData chunkData = chunk.getData(ModAttachments.LINGQI_CHUNK_DATA);
+
 
         //确定当前功法.TODO:现在默认使用黄阶，之后使用get方法获取
         GongFaLevel currentGongFa = GongFaLevel.HUANG;
@@ -59,16 +59,13 @@ public class XiuLianTickHandler {
         float demand = Math.min(gongfaSpeed, bodyLimit);
 
         //扣除灵气
-        float consume = chunkData.consumeLingQi(demand);
+        float consume = LingQiHelper.baseAbsorb(player, demand);
 
         //修为转化逻辑
         if (consume > 0.0f) {
             //成功吸收
             float gainedExp = consume * currentGongFa.getEfficiency();
             JingJieHelper.addExperience(player, gainedExp);
-
-            //标记区块数据脏了
-            chunk.setUnsaved(true);
 
             //HUD
             String msg = String.format("§a修炼中... 灵气 -%.1f / 修为 +%.1f", consume, gainedExp);
