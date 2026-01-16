@@ -116,11 +116,7 @@ public class JingJieHelper {
         //创建包
         SyncJingJiePayload payload = new SyncJingJiePayload(
                 player.getId(),
-                data.getLevel(),
-                data.getExperience(),
-                data.getLingli(),
-                data.isXiulian(),
-                data.getMainGongFaName()
+                data.serializeNBT(player.registryAccess())  //把所有属性打包为一个CompoundTag
         );
 
         //发送数据包
