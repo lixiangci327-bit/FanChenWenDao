@@ -15,11 +15,6 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record SpawnBurstPayload(double x, double y, double z) implements CustomPacketPayload {
 
-    //实现type（）方法
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
 
     //定义唯一类型ID
     public static final Type<SpawnBurstPayload> TYPE = new Type<>(
@@ -34,23 +29,8 @@ public record SpawnBurstPayload(double x, double y, double z) implements CustomP
             SpawnBurstPayload::new
     );
 
-    //处理逻辑
-    //客户端收到该包时进行处理
-    public static void handle(final SpawnBurstPayload payload, final IPayloadContext context){
-        //将逻辑放入主线程队列，确保线程安全
-        context.enqueueWork(() -> {
-            //获取客户端世界
-            var level = Minecraft.getInstance().level;
-            if (level != null) {
-                //加载爆炸特性
-                FX fx = FXHelper.getFX(ResourceLocation.parse("photon:huoqiu01burst"));
-                if (fx != null) {
-                    //在指定坐标播放世界特性
-                    ExampleExecutor executor = new ExampleExecutor(fx, level);
-                    executor.emit();
-                    executor.setPosition(payload.x(), payload.y(), payload.z());
-                }
-            }
-        });
+    @Override
+    public Type<? extends  CustomPacketPayload> type() {
+        return TYPE;
     }
 }

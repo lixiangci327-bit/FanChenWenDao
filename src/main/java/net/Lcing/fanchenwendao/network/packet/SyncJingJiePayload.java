@@ -33,22 +33,4 @@ public record SyncJingJiePayload(int entityId, CompoundTag dataTag) implements C
         return TYPE;
     }
 
-    //收包处理逻辑
-    public static void handle(final SyncJingJiePayload payload, final IPayloadContext context) {
-        context.enqueueWork(() -> {
-            var clientLevel = Minecraft.getInstance().level;
-            if (clientLevel != null) {
-                //客户端找对应实体
-                Entity entity = clientLevel.getEntity(payload.entityId());
-                //只处理玩家数据
-                if (entity instanceof Player player) {
-                    //获取玩家身上的jingjiedata
-                    JingJieData data = player.getData(ModAttachments.JINGJIE_DATA);
-                    //更新收到的新数据
-                    //直接调用data自己的反序列化方法
-                    data.deserializeNBT(clientLevel.registryAccess(), payload.dataTag());
-                }
-            }
-        });
-    }
 }

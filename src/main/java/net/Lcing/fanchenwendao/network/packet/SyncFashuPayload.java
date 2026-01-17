@@ -36,30 +36,4 @@ public record SyncFashuPayload(int entityId, int fashuId) implements CustomPacke
         return TYPE;
     }
 
-    //客户端收包后逻辑
-    public static void handle(final SyncFashuPayload payload, final IPayloadContext context) {
-
-        //enqueueWork 把任务排队到主线程
-        context.enqueueWork(() -> {
-            //客户端逻辑
-            //获取客户端世界
-            var level = Minecraft.getInstance().level;
-
-            if (level != null) {
-                //根据ID查找实体
-                Entity targetEntity = level.getEntity(payload.entityId());
-
-                //确保是玩家
-                if (targetEntity instanceof Player player) {
-                    //拿到客户端的法术数据
-                    FashuData data = player.getData(ModAttachments.FASHU_DATA);
-
-                    //同步客户端数据
-                    data.setCurrentFashu(FashuType.getById(payload.fashuId()));
-                }
-
-            }
-
-        });
-    }
 }
