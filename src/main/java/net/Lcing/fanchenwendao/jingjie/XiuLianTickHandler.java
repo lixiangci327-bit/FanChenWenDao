@@ -2,17 +2,13 @@ package net.Lcing.fanchenwendao.jingjie;
 
 
 import net.Lcing.fanchenwendao.FanChenWenDao;
-import net.Lcing.fanchenwendao.gongfa.GongFaLevel;
-import net.Lcing.fanchenwendao.lingqisystem.LingQiChunkData;
+import net.Lcing.fanchenwendao.gongfa.XiuLianData;
 import net.Lcing.fanchenwendao.lingqisystem.LingQiHelper;
-import net.Lcing.fanchenwendao.registry.ModAttachments;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -47,11 +43,11 @@ public class XiuLianTickHandler {
         ServerLevel level = (ServerLevel) player.level();
 
 
-        //确定当前功法.TODO:现在默认使用黄阶，之后使用get方法获取
-        GongFaLevel currentGongFa = GongFaLevel.HUANG;
+        //确定当前功法.
+        XiuLianData tempXiuLianData = new XiuLianData(5.0f, 1.0f, 0.6f);
 
         //计算理论吸收速度
-        float gongfaSpeed = currentGongFa.getBaserate();    //功法基础速度
+        float gongfaSpeed = tempXiuLianData.getBaseSpeed();    //功法基础速度
         int playerLevel = JingJieHelper.getLevel(player);
         float bodyLimit = (playerLevel >= 16) ? 25.0f : 5.0f;
 
@@ -64,7 +60,7 @@ public class XiuLianTickHandler {
         //修为转化逻辑
         if (consume > 0.0f) {
             //成功吸收
-            float gainedExp = consume * currentGongFa.getEfficiency();
+            float gainedExp = consume * tempXiuLianData.getEfficiency();
             JingJieHelper.addExperience(player, gainedExp);
 
             //HUD

@@ -49,8 +49,6 @@ public class LingQiEventHandler {
             //标记区块：数据变了，游戏存盘时需要把该区块保存下来
             chunk.setUnsaved(true);
 
-            //DEBUG; TODO:删除日志
-            FanChenWenDao.LOGGER.info("初始化灵气：Chunk [{}, {}] -> max:{}", chunk.getPos().x, chunk.getPos().z, maxLingQi);
         }
 
 

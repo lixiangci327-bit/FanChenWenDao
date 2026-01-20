@@ -2,9 +2,11 @@ package net.Lcing.fanchenwendao;
 
 import net.Lcing.fanchenwendao.client.animation.FCAnimations;
 import net.Lcing.fanchenwendao.event.CommonEventHandler;
+import net.Lcing.fanchenwendao.gongfa.GongFaManager;
 import net.Lcing.fanchenwendao.registry.*;
 
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -22,15 +24,11 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 @Mod(FanChenWenDao.MODID)
 public class FanChenWenDao {
-    // Define mod id in a common place for everything to reference
+
     public static final String MODID = "fanchenwendao";
-    // Directly reference a slf4j logger
+
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    // The constructor for the mod class is the first code that is run when your mod
-    // is loaded.
-    // FML will recognize some parameter types like IEventBus or ModContainer and
-    // pass them in automatically.
     public FanChenWenDao(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
@@ -43,13 +41,12 @@ public class FanChenWenDao {
         // 注册通用游戏事件 (CommonEventHandler)
         NeoForge.EVENT_BUS.register(CommonEventHandler.class);
 
-        ModCreativeModeTabs.register(modEventBus);
 
+        ModCreativeModeTabs.register(modEventBus);
         ModItems.register(modEventBus);
         ModEntities.register(modEventBus);
         ModAttachments.register(modEventBus);
         ModMenuTypes.register(modEventBus);
-
 
         //注册动画事件
         modEventBus.addListener(FCAnimations::registerAnimations);
@@ -72,5 +69,11 @@ public class FanChenWenDao {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
 
+    }
+
+    //资源重载方法
+    @SubscribeEvent
+    public void onAddReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(new GongFaManager());
     }
 }
