@@ -4,8 +4,13 @@ import net.Lcing.fanchenwendao.FanChenWenDao;
 import net.Lcing.fanchenwendao.fashu.FashuData;
 import net.Lcing.fanchenwendao.jingjie.JingJieData;
 import net.Lcing.fanchenwendao.lingqisystem.LingQiChunkData;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
+import net.neoforged.neoforge.attachment.IAttachmentSerializer;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
@@ -32,7 +37,20 @@ public class ModAttachments {
     public static final Supplier<AttachmentType<JingJieData>> JINGJIE_DATA = ATTACHMENT_TYPES.register(
             "jingjie_data",
             () -> AttachmentType.<JingJieData>builder(() -> new JingJieData())
-                    .serialize(JingJieData.CODEC)//告诉游戏怎么保存数据Codec
+                    .serialize(new IAttachmentSerializer<CompoundTag, JingJieData>() {
+
+                        @Override
+                        public JingJieData read(IAttachmentHolder holder, CompoundTag tag, HolderLookup.Provider provider) {
+                            JingJieData data = new JingJieData();
+                            data.deserializeNBT(provider, tag);
+                            return data;
+                        }
+
+                        @Override
+                        public CompoundTag write(JingJieData data, HolderLookup.Provider provider) {
+                            return data.serializeNBT(provider);
+                        }
+                    })
                     .copyOnDeath()//死亡后复制
                     .build()
     );

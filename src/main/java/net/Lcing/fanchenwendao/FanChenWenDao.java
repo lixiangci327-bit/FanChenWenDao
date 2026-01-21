@@ -47,6 +47,7 @@ public class FanChenWenDao {
         ModEntities.register(modEventBus);
         ModAttachments.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        ModDataComponents.register(modEventBus);
 
         //注册动画事件
         modEventBus.addListener(FCAnimations::registerAnimations);

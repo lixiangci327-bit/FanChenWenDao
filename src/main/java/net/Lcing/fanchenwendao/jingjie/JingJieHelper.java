@@ -4,7 +4,9 @@ package net.Lcing.fanchenwendao.jingjie;
 import net.Lcing.fanchenwendao.network.packet.SyncJingJiePayload;
 import net.Lcing.fanchenwendao.registry.ModAttachments;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 //境界系统的核心辅助类
@@ -32,8 +34,8 @@ public class JingJieHelper {
     }
 
     //获取当前功法
-    public static String getMainGongFaName(ServerPlayer player) {
-        return player.getData(ModAttachments.JINGJIE_DATA).getMainGongFaName();
+    public static ResourceLocation getMainGongFaID(ServerPlayer player) {
+        return player.getData(ModAttachments.JINGJIE_DATA).getMainGongFaID();
     }
 
 
@@ -63,12 +65,20 @@ public class JingJieHelper {
         JingJieData data = player.getData(ModAttachments.JINGJIE_DATA);
         data.addExperience(amount);
 
-        //检查是否满足升级条件 （简单逻辑，后续引入突破概率、必须条件、隐藏彩蛋）
-        if (data.getExperience() >= data.getMaxExperience()) {
+        //检查是否满足升级条件 （简单逻辑，TODO:后续引入突破概率、必须条件、隐藏彩蛋）
+        if (data.getExperience() >= getMaxExperience(player)) {
             Levelup(player);
         } else {
             syncToClient(player);//未升级也要同步修为
         }
+    }
+
+    //计算升级所需的修为
+    public static float getMaxExperience(Player player) {
+        JingJieData data = player.getData(ModAttachments.JINGJIE_DATA);
+        int level = data.getLevel();
+        if (level == 0) return 100.0f;
+        return (float) (100.0 * Math.pow(1.5, level));
     }
 
     //提升境界

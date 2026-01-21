@@ -3,9 +3,16 @@ package net.Lcing.fanchenwendao.jingjie;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.Lcing.fanchenwendao.gongfa.GongFaInstance;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.util.INBTSerializable;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 
 //境界数据类——存储玩家的修仙境界信息
@@ -16,7 +23,8 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
     private float experience;//修为
     private float lingli;   //灵力
     private boolean isXiulian;  //是否修炼的开关
-    private String mainGongFaName;  //主修功法ID
+    private ResourceLocation mainGongFaID;  //主修功法ID
+    private Map<ResourceLocation, GongFaInstance> learnedGongFas;   //已经学会的功法库
 
     //默认构造函数：玩家刚生成时为0
     public JingJieData() {
@@ -24,16 +32,19 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         this.experience = 0;
         this.lingli = 0;
         this.isXiulian = false;
-        this.mainGongFaName = "none";   //默认无功法
+        this.mainGongFaID = null;   //默认无功法
+        this.learnedGongFas = new HashMap<>();  //初始化Map,防止get/put调用时空指针报错
     }
 
     //带参数的构造函数，由Codec使用
-    public JingJieData(int level, float experience, float lingli, boolean isXiulian, String mainGongFaName) {
+    public JingJieData(int level, float experience, float lingli, boolean isXiulian,
+                       Optional<ResourceLocation> mainGongFaID, Map<ResourceLocation, GongFaInstance> learnedGongFas) {
         this.level = level;
         this.experience = experience;
         this.lingli = lingli;
         this.isXiulian = isXiulian;
-        this.mainGongFaName = mainGongFaName;
+        this.mainGongFaID = mainGongFaID.orElse(null);
+        this.learnedGongFas = learnedGongFas;
     }
 
     //Getter
@@ -45,7 +56,15 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
 
     public boolean isXiulian() {return isXiulian;}
 
-    public String getMainGongFaName() {return mainGongFaName;}
+    public ResourceLocation getMainGongFaID() {return mainGongFaID;}
+
+    public Map<ResourceLocation, GongFaInstance> getLearnedGongFas() { return learnedGongFas; }
+
+    //获取当前主修功法的功法实例，若无则返回null
+    public GongFaInstance getMainGongFaInstance() {
+        if (this.mainGongFaID == null) return null;
+        return learnedGongFas.get(mainGongFaID);
+    }
 
 
 
@@ -66,13 +85,15 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         this.isXiulian = isXiulian;
     }
 
-    public void setMainGongFaName(String mainGongFaName) {
-        this.mainGongFaName = mainGongFaName;
+    public void setMainGongFaID(ResourceLocation id) {
+        if (this.learnedGongFas.containsKey(id)) {
+            this.mainGongFaID = id;
+        }
     }
 
 
 
-
+    //内部Helper（不依赖外部环境）
     public void addExperience(float amount) {
         this.experience += amount;
     }
@@ -84,16 +105,25 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         }
     }
 
-    //计算升级所需的修为
-    public float getMaxExperience() {
-        if (level == 0 ) return 100.0f;//凡人到凝气一层
-        return (float) (100.0 * Math.pow(1.5, level));
-    }
 
     //升级方法
     public void levelUp() {
         setLevel(level + 1);
         setExperience(0);//升级后的修为，目前暂定为0，后续改为溢出值，以及连续破境的逻辑
+    }
+
+    //学习新功法
+    public GongFaInstance learnGongFa(ResourceLocation id) {
+        //先确认有没有这本书
+        GongFaInstance instance = this.learnedGongFas.get(id);
+
+        //如果没有说明没有学习过
+        if (instance == null) {
+            //创建一个新的实例放进Map
+            instance = new GongFaInstance(id);
+            this.learnedGongFas.put(id, instance);
+        }
+        return instance;    //返回这本功法，不管是否学习过
     }
 
 
@@ -106,7 +136,8 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
                     Codec.FLOAT.optionalFieldOf("experience", 0.0f).forGetter(JingJieData::getExperience),
                     Codec.FLOAT.optionalFieldOf("lingli", 0.0f).forGetter(JingJieData::getLingli),
                     Codec.BOOL.optionalFieldOf("is_xiulian", false).forGetter(JingJieData::isXiulian),
-                    Codec.STRING.optionalFieldOf("maingongfaname", "none").forGetter(JingJieData::getMainGongFaName)
+                    ResourceLocation.CODEC.optionalFieldOf("main_gongfa_id").forGetter(data -> Optional.ofNullable(data.getMainGongFaID())),
+                    Codec.unboundedMap(ResourceLocation.CODEC, GongFaInstance.CODEC).optionalFieldOf("learned_gongfas", new HashMap<>()).forGetter(JingJieData::getLearnedGongFas)
             ).apply(instance, JingJieData::new)
     );
 
@@ -119,7 +150,18 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         tag.putFloat("experience", this.experience);
         tag.putFloat("lingli", this.lingli);
         tag.putBoolean("is_xiulian", this.isXiulian);
-        tag.putString("maingongfaname", this.mainGongFaName == null ? "none" : this.mainGongFaName);    //若null则存为“none”
+
+        if (this.mainGongFaID != null) {
+            tag.putString("main_gongfa_id", this.mainGongFaID.toString());
+        }
+
+        //功法Map
+        ListTag listTag = new ListTag();    //创建列表容器
+        for (GongFaInstance instance : this.learnedGongFas.values()) {  //遍历所有功法，对所有的instance做操作
+            listTag.add(instance.saveToNBT());  //对象转为NBT
+        }
+        tag.put("learned_gongfas", listTag);    //贴上标识放入tag
+
         return tag;
     }
 
@@ -130,12 +172,28 @@ public class JingJieData implements INBTSerializable<CompoundTag> {
         if (tag.contains("experience")) {this.experience = tag.getFloat("experience");}
         if (tag.contains("lingli")) {this.lingli = tag.getFloat("lingli");}
         if (tag.contains("is_xiulian")) {this.isXiulian = tag.getBoolean("is_xiulian");}
-        if (tag.contains("maingongfaname")) {this.mainGongFaName = tag.getString("maingongfaname");}
+
+        if (tag.contains("main_gongfa_id")) {
+            this.mainGongFaID = ResourceLocation.parse(tag.getString("main_gongfa_id"));
+        } else {
+            this.mainGongFaID = null;
+        }
+
+        if (tag.contains("learned_gongfas")) {  //防止读空
+            this.learnedGongFas.clear();    //清空当前内存
+            ListTag listTag = tag.getList("learned_gongfas", ListTag.TAG_COMPOUND);
+            for (int i = 0; i < listTag.size(); i++) {
+                CompoundTag instanceTag = listTag.getCompound(i);
+                GongFaInstance instance = GongFaInstance.loadFromNBT(instanceTag);  //NBT转为对象
+                this.learnedGongFas.put(instance.getGongfaID(), instance);  //放回map
+            }
+
+        }
     }
 
     //debug
     @Override
     public String toString() {
-        return "JingJieData{level=" + level + ", exp=" + experience + ", gongfa=" + mainGongFaName + "}";
+        return "JingJieData{level=" + level + ", exp=" + experience + ", main=" + mainGongFaID + ", count=" + learnedGongFas.size() + "}";
     }
 }

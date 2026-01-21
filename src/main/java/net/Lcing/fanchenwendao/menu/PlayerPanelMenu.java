@@ -4,6 +4,7 @@ import com.lowdragmc.lowdraglib2.gui.holder.IModularUIHolderMenu;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
 import net.Lcing.fanchenwendao.client.ui.ldlib.PlayerPanelUI;
 import net.Lcing.fanchenwendao.jingjie.JingJieData;
+import net.Lcing.fanchenwendao.jingjie.JingJieHelper;
 import net.Lcing.fanchenwendao.registry.ModAttachments;
 import net.Lcing.fanchenwendao.registry.ModMenuTypes;
 import net.minecraft.world.entity.player.Inventory;
@@ -66,7 +67,7 @@ public class PlayerPanelMenu extends AbstractContainerMenu {
     }
 
     public float getMaxExp() {
-        return (float) getJingJieData().getMaxExperience();
+        return JingJieHelper.getMaxExperience(this.player);
     }
 
     public long getLevel() {

@@ -2,9 +2,12 @@ package net.Lcing.fanchenwendao.jingjie;
 
 
 import net.Lcing.fanchenwendao.FanChenWenDao;
+import net.Lcing.fanchenwendao.gongfa.GongFaDefine;
+import net.Lcing.fanchenwendao.gongfa.GongFaManager;
 import net.Lcing.fanchenwendao.gongfa.XiuLianData;
 import net.Lcing.fanchenwendao.lingqisystem.LingQiHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -12,6 +15,8 @@ import net.minecraft.world.effect.MobEffects;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+
+import java.util.Optional;
 
 
 @EventBusSubscriber(modid = FanChenWenDao.MODID)
@@ -43,16 +48,36 @@ public class XiuLianTickHandler {
         ServerLevel level = (ServerLevel) player.level();
 
 
-        //确定当前功法.
-        XiuLianData tempXiuLianData = new XiuLianData(5.0f, 1.0f, 0.6f);
+        //获取玩家主修功法
+        ResourceLocation mainGongFaID = JingJieHelper.getMainGongFaID(player);
+        //若主修为空
+        if (mainGongFaID == null) {
+            player.displayClientMessage(Component.literal("未修习功法"), false);
+            JingJieHelper.setXiulian(player, false);
+            return;
+        }
+
+        //获取功法数据
+        Optional<GongFaDefine> gongfaOpt = GongFaManager.getGongFa(mainGongFaID);
+        if (gongfaOpt.isEmpty()) {
+            //功法数据丢失
+            player.displayClientMessage(Component.literal("功法数据丢失。ID：" + mainGongFaID), true);
+            JingJieHelper.setXiulian(player, false);
+            return;
+        }
+        GongFaDefine gongfaDefine = gongfaOpt.get();
+        XiuLianData xiulianData = gongfaDefine.getXiulian();
 
         //计算理论吸收速度
-        float gongfaSpeed = tempXiuLianData.getBaseSpeed();    //功法基础速度
+        float baseSpeed = xiulianData.getBaseSpeed();    //功法基础速度
+        float efficiency = xiulianData.getEfficiency();
         int playerLevel = JingJieHelper.getLevel(player);
         float bodyLimit = (playerLevel >= 16) ? 25.0f : 5.0f;
 
+        //TODO:增加更加复杂的speed计算
+
         //取实际量（不能超过身体极限）
-        float demand = Math.min(gongfaSpeed, bodyLimit);
+        float demand = Math.min(baseSpeed, bodyLimit);
 
         //扣除灵气
         float consume = LingQiHelper.baseAbsorb(player, demand);
@@ -60,7 +85,7 @@ public class XiuLianTickHandler {
         //修为转化逻辑
         if (consume > 0.0f) {
             //成功吸收
-            float gainedExp = consume * tempXiuLianData.getEfficiency();
+            float gainedExp = consume * efficiency;
             JingJieHelper.addExperience(player, gainedExp);
 
             //HUD
