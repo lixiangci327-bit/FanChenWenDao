@@ -68,4 +68,11 @@ public class GongFaManager extends SimpleJsonResourceReloadListener {
         return GONGFAS;
     }
 
+    //从服务端同步数据
+    public static void syncFromServer(Map<ResourceLocation, GongFaDefine> gongfas) {
+        GONGFAS.clear();
+        GONGFAS.putAll(gongfas);    //放入新数据
+        LOGGER.info("已从服务端同步 {} 个功法定义。", gongfas.size());
+    }
+
 }

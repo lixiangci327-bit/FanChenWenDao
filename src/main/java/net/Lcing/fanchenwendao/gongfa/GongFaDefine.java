@@ -3,6 +3,9 @@ package net.Lcing.fanchenwendao.gongfa;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
 //定义功法
@@ -53,4 +56,31 @@ public class GongFaDefine {
             ComprehensionData.CODEC.fieldOf("comprehension").forGetter(GongFaDefine::getComprehension),
             DisplayData.CODEC.optionalFieldOf("display", new DisplayData(ResourceLocation.parse("minecraft:book"), 0xFFFFFF)).forGetter(GongFaDefine::getDisplay)
     ).apply(instance, GongFaDefine::new));
+
+
+    //StreamCodec
+    public static final StreamCodec<FriendlyByteBuf, GongFaDefine> STREAM_CODEC = StreamCodec.of(
+            //编码器，把对象写入buffer
+            (buf, gongfa) -> {
+                ResourceLocation.STREAM_CODEC.encode(buf, gongfa.getId());
+                ByteBufCodecs.STRING_UTF8.encode(buf, gongfa.getName());
+                ByteBufCodecs.STRING_UTF8.encode(buf, gongfa.getDescription());
+                ByteBufCodecs.STRING_UTF8.encode(buf, gongfa.getAttribute());
+                ByteBufCodecs.STRING_UTF8.encode(buf, gongfa.getLevel());
+                XiuLianData.STREAM_CODEC.encode(buf, gongfa.getXiulian());
+                ComprehensionData.STREAM_CODEC.encode(buf, gongfa.getComprehension());
+                DisplayData.STREAM_CODEC.encode(buf, gongfa.getDisplay());
+            },
+            //解码器
+            (buf) -> new GongFaDefine(
+                    ResourceLocation.STREAM_CODEC.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    ByteBufCodecs.STRING_UTF8.decode(buf),
+                    XiuLianData.STREAM_CODEC.decode(buf),
+                    ComprehensionData.STREAM_CODEC.decode(buf),
+                    DisplayData.STREAM_CODEC.decode(buf)
+            )
+    );
 }

@@ -3,6 +3,9 @@ package net.Lcing.fanchenwendao.gongfa;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 
 //功法修炼数据
@@ -31,4 +34,12 @@ public class XiuLianData {
             Codec.FLOAT.fieldOf("base_mastery").forGetter(XiuLianData::getBaseMastery),
             Codec.FLOAT.fieldOf("efficiency").forGetter(XiuLianData::getEfficiency)
     ).apply(instance, XiuLianData::new));
+
+    //StreamCodec
+    public static final StreamCodec<FriendlyByteBuf, XiuLianData> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.FLOAT, XiuLianData::getBaseSpeed,
+            ByteBufCodecs.FLOAT, XiuLianData::getBaseMastery,
+            ByteBufCodecs.FLOAT, XiuLianData::getEfficiency,
+            XiuLianData::new
+    );
 }

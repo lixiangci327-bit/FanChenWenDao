@@ -3,6 +3,9 @@ package net.Lcing.fanchenwendao.gongfa;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 //参悟功法需求
 public class Requirements {
@@ -24,4 +27,11 @@ public class Requirements {
             Codec.INT.optionalFieldOf("xp_consume", 0).forGetter(Requirements::getXpConsume),
             Codec.FLOAT.optionalFieldOf("min_lingqi", 0.0f).forGetter(Requirements::getMinLingQi)
     ).apply(instance, Requirements::new));
+
+    //StreamCodec
+    public static final StreamCodec<FriendlyByteBuf, Requirements> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, Requirements::getXpConsume,
+            ByteBufCodecs.FLOAT, Requirements::getMinLingQi,
+            Requirements::new
+    );
 }

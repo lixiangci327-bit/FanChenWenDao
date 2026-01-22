@@ -4,6 +4,7 @@ import net.Lcing.fanchenwendao.FanChenWenDao;
 import net.Lcing.fanchenwendao.client.handler.ClientPayloadHandler;
 import net.Lcing.fanchenwendao.network.packet.SpawnBurstPayload;
 import net.Lcing.fanchenwendao.network.packet.SyncFashuPayload;
+import net.Lcing.fanchenwendao.network.packet.SyncGongFaPayload;
 import net.Lcing.fanchenwendao.network.packet.SyncJingJiePayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -49,6 +50,18 @@ public class ModNetwork {
                 ((payload, context) -> {
                     if (FMLEnvironment.dist.isClient()) {
                         net.Lcing.fanchenwendao.client.handler.ClientPayloadHandler.handleSyncJingJie(payload, context);
+                    }
+                })
+        );
+
+        //功法定义数据同步包
+        registrar.playToClient(
+                SyncGongFaPayload.TYPE,
+                SyncGongFaPayload.STREAM_CODEC,
+                ((payload, context) -> {
+                    //只在客户端执行
+                    if (FMLEnvironment.dist.isClient()) {
+                        ClientPayloadHandler.handleSyncGongFa(payload, context);
                     }
                 })
         );

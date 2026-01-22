@@ -5,9 +5,11 @@ import com.lowdragmc.photon.client.fx.FXHelper;
 import net.Lcing.fanchenwendao.client.fx.ExampleExecutor;
 import net.Lcing.fanchenwendao.fashu.FashuData;
 import net.Lcing.fanchenwendao.fashu.FashuType;
+import net.Lcing.fanchenwendao.gongfa.GongFaManager;
 import net.Lcing.fanchenwendao.jingjie.JingJieData;
 import net.Lcing.fanchenwendao.network.packet.SpawnBurstPayload;
 import net.Lcing.fanchenwendao.network.packet.SyncFashuPayload;
+import net.Lcing.fanchenwendao.network.packet.SyncGongFaPayload;
 import net.Lcing.fanchenwendao.network.packet.SyncJingJiePayload;
 import net.Lcing.fanchenwendao.registry.ModAttachments;
 import net.minecraft.client.Minecraft;
@@ -83,6 +85,14 @@ public class ClientPayloadHandler {
                     data.deserializeNBT(clientLevel.registryAccess(), payload.dataTag());
                 }
             }
+        });
+    }
+
+    //处理功法数据同步
+    public static void handleSyncGongFa(final SyncGongFaPayload payload, final IPayloadContext context) {
+        //切回主线程执行（网络包在网络线程接收，不能直接操作游戏数据）
+        context.enqueueWork(() -> {
+            GongFaManager.syncFromServer(payload.gongfas());
         });
     }
 

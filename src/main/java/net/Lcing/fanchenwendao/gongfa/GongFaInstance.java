@@ -4,6 +4,9 @@ package net.Lcing.fanchenwendao.gongfa;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
 //功法实例类
@@ -63,6 +66,14 @@ public class GongFaInstance {
             Codec.INT.optionalFieldOf("layer", 0).forGetter(GongFaInstance::getLayer),
             Codec.FLOAT.optionalFieldOf("mastery", 0.0f).forGetter(GongFaInstance::getMastery)
     ).apply(instance, GongFaInstance::new));
+
+    //StreamCodec
+    public static final StreamCodec<FriendlyByteBuf, GongFaInstance> STREAM_CODEC = StreamCodec.composite(
+            ResourceLocation.STREAM_CODEC, GongFaInstance::getGongfaID,
+            ByteBufCodecs.VAR_INT, GongFaInstance::getLayer,
+            ByteBufCodecs.FLOAT, GongFaInstance::getMastery,
+            GongFaInstance::new
+    );
 
     //DEBUG
     @Override

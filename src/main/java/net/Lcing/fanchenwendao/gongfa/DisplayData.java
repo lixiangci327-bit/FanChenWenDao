@@ -3,6 +3,9 @@ package net.Lcing.fanchenwendao.gongfa;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
 //功法外观视觉数据
@@ -25,4 +28,11 @@ public class DisplayData {
             ResourceLocation.CODEC.optionalFieldOf("icon", ResourceLocation.parse("fannchenwendao:gongfa_book")).forGetter(DisplayData::getIcon),
             Codec.INT.optionalFieldOf("color", 0xFFFFFF).forGetter(DisplayData::getColor)
     ).apply(instance, DisplayData::new));
+
+    //StreamCodec
+    public static final StreamCodec<FriendlyByteBuf, DisplayData> STREAM_CODEC = StreamCodec.composite(
+            ResourceLocation.STREAM_CODEC, DisplayData::getIcon,
+            ByteBufCodecs.VAR_INT, DisplayData::getColor,
+            DisplayData::new
+    );
 }
