@@ -6,6 +6,7 @@ import com.lowdragmc.lowdraglib2.gui.ui.UI;
 import net.Lcing.fanchenwendao.client.ui.ldlib.GongFaUI;
 import net.Lcing.fanchenwendao.gongfa.GongFaDefine;
 import net.Lcing.fanchenwendao.gongfa.GongFaManager;
+import net.Lcing.fanchenwendao.gongfa.Requirements;
 import net.Lcing.fanchenwendao.jingjie.JingJieData;
 import net.Lcing.fanchenwendao.jingjie.JingJieHelper;
 import net.Lcing.fanchenwendao.registry.ModAttachments;
@@ -57,11 +58,7 @@ public class GongFaBook_01 extends Item implements HeldItemUIMenuType.HeldItemUI
         ResourceLocation id = stack.get(ModDataComponents.GONGFA_ID);
 
         if (id != null) {
-            Optional<GongFaDefine> defineOpt = GongFaManager.getGongFa(id);
-            if (defineOpt.isPresent()) {
-                GongFaDefine define = defineOpt.get();
-                return GongFaUI.buildUI(holder.player, define.getName(), define.getLevel(), define.getDescription());
-            }
+            return GongFaUI.buildUI(holder.player, id);
         }
         //若数据存在问题
         return new ModularUI(UI.empty());
@@ -89,19 +86,33 @@ public class GongFaBook_01 extends Item implements HeldItemUIMenuType.HeldItemUI
 
                 if (isLearned) {
                     player.displayClientMessage(Component.literal("§e你已习得此功法，无需再次参悟。"), false);
-                } else {
-                    //存入到玩家的data
-                    data.learnGongFa(id);
-                    player.displayClientMessage(Component.literal("已习得功法：").append(getName(stack)), false);
-
-                    //设置主修
-                    if (data.getMainGongFaID() == null) {
-                        data.setMainGongFaID(id);
-                    }
-
-                    //同步数据到客户端
-                    JingJieHelper.syncToClient(serverPlayer);
+                    return InteractionResultHolder.success(stack);
                 }
+
+
+                Optional<GongFaDefine> defineOpt = GongFaManager.getGongFa(id);
+                if (defineOpt.isEmpty()) return InteractionResultHolder.fail(stack);
+
+                GongFaDefine define = defineOpt.get();
+                Requirements requirements = define.getComprehension().getRequirements();
+
+                //获取环境灵气
+                float currentLingQi = level.getChunk(player.blockPosition())
+                        .getData(ModAttachments.LINGQI_CHUNK_DATA)
+                                .getCurrentLingQi();
+
+                //检测要求是否满足
+                if (player.experienceLevel < requirements.getXpConsume() || currentLingQi < requirements.getMinLingQi()) {
+                    player.displayClientMessage(Component.literal(String.format("§c未满足要求无法习得功法")),false);
+                    return InteractionResultHolder.fail(stack);
+                }
+
+                //扣除要求
+                player.giveExperienceLevels(-requirements.getXpConsume());
+                data.learnGongFa(id);
+                player.displayClientMessage(Component.literal("§a参悟成功！已习得：").append(define.getName()), false);
+                JingJieHelper.syncToClient(serverPlayer);
+
             } else {
                 //右键打开UI
                 HeldItemUIMenuType.openUI(serverPlayer, usehand);

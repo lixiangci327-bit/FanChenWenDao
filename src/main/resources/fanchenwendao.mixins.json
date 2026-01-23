@@ -4,6 +4,7 @@
   "package": "net.Lcing.fanchenwendao.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "CurveConfiguratorMixin"
   ],
   "injectors": {
     "defaultRequire": 1
