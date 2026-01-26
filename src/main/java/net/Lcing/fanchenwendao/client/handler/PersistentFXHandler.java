@@ -6,7 +6,6 @@ import com.lowdragmc.photon.client.fx.FXHelper;
 import net.Lcing.fanchenwendao.FanChenWenDao;
 import net.Lcing.fanchenwendao.client.fx.BoneExecutor;
 import net.Lcing.fanchenwendao.fashu.FashuData;
-import net.Lcing.fanchenwendao.fashu.FashuType;
 import net.Lcing.fanchenwendao.registry.ModAttachments;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -35,10 +34,11 @@ public class PersistentFXHandler {
 
         //读取同步过来的数据
         FashuData data = player.getData(ModAttachments.FASHU_DATA);
-        FashuType currentType = data.getCurrentFashu();
+        ResourceLocation currentId = data.getCurrentFaShuId();
 
         //定义状态逻辑——即配置特效
-        boolean isFireFistActive = (currentType == FashuType.FIREBALL_SHOOT);
+        // 目前暂时写死判断，后续可以改为从 FaShuDefine 读取视觉配置
+        boolean isFireFistActive = ResourceLocation.parse("fanchenwendao:fireball").equals(currentId);
         //更新特效
         updateEffect(player, "fire_fist", isFireFistActive, "firefist", "Tool_R", "Tool_L");
     }

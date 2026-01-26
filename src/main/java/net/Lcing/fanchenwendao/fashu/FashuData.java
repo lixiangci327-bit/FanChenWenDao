@@ -5,61 +5,59 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.UnknownNullability;
 
 import java.io.Serializable;
 import java.security.Provider;
+import java.util.ArrayList;
+import java.util.List;
 
 //存储法术数据
 public class FashuData implements INBTSerializable<CompoundTag> {
 
-    //存储具体的枚举对象
-    private FashuType currentFashu = FashuType.FIREBALL_SHOOT;
+    private static final ResourceLocation EMPTY_FASHU = ResourceLocation.parse("fanchenwendao:empty");
+    private ResourceLocation currentFaShuId = EMPTY_FASHU;
 
+    public FashuData() {}
 
-    //定义Codec
-    public static final Codec<FashuData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            //定义要保存的字段
-            Codec.INT.fieldOf("CurrentFashu").forGetter(d -> d.currentFashu.getId())
-    ).apply(instance, (id) -> {
-        //定义如何从读取到的数据（id）还原出FashuData对象
-        FashuData data = new FashuData();
-        data.setCurrentFashu(FashuType.getById(id));
-        return data;
-    }));
-
-
-    //无参的构造函数，实例化注册器
-    public FashuData() {
+    public ResourceLocation getCurrentFaShuId() {
+        return currentFaShuId;
     }
 
-    public FashuType getCurrentFashu() {
-        return currentFashu;
+    public void setCurrentFaShuId(ResourceLocation currentFaShuId) {
+        this.currentFaShuId = currentFaShuId;
     }
 
-    public void setCurrentFashu(FashuType Fashu) {
-        this.currentFashu = Fashu;
-    }
-
-
-    //循环法术切换
+    //循环切换法术
     public void cycleNext() {
-        int nextid = (currentFashu.getId() + 1) % FashuType.values().length;
-        this.currentFashu = FashuType.getById(nextid);
-    }
+        //获取全服法术列表
+        List<ResourceLocation> allIds = new ArrayList<>(FaShuManager.getAll().keySet());
+        //若无法术
+        if (allIds.isEmpty()) return;
 
+        //状态修正：玩家当前法术为空 / 存档内法术ID在当前服务器列表找不到
+        if (currentFaShuId.equals(EMPTY_FASHU) || !allIds.contains(currentFaShuId)) {
+            this.currentFaShuId = allIds.get(0);    //自动设置为第一个
+            return;
+        }
+
+        //正常循环
+        int currentIndex = allIds.indexOf(currentFaShuId);
+        int nextIndex = (currentIndex + 1) % allIds.size();
+        this.currentFaShuId = allIds.get(nextIndex);
+    }
 
 
     //数据持久化
-    //将FashuType转换成int存进NBT
     //保存数据，游戏保存/玩家下线时调用
     @Override
     public @UnknownNullability CompoundTag serializeNBT(HolderLookup.Provider provider) {
 
         CompoundTag tag = new CompoundTag();
-        //存入数据，key = "CurrentFashu", value = 0
-        tag.putInt("CurrentFashu", currentFashu.getId());
+        //存入数据，key = "currentFashu", value = 0
+        tag.putString("currentFaShuId", currentFaShuId.toString());
         return tag;
 
     }
@@ -67,8 +65,8 @@ public class FashuData implements INBTSerializable<CompoundTag> {
     //从NBT读出int，变回Type
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        if (tag.contains("CurrentFashu")) {
-            this.currentFashu = FashuType.getById(tag.getInt("CurrentFashu"));
+        if (tag.contains("currentFaShuId")) {
+            this.currentFaShuId = ResourceLocation.parse(tag.getString("currentFaShuId"));
         }
     }
 }

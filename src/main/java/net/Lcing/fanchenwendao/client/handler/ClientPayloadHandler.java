@@ -3,14 +3,10 @@ package net.Lcing.fanchenwendao.client.handler;
 import com.lowdragmc.photon.client.fx.FX;
 import com.lowdragmc.photon.client.fx.FXHelper;
 import net.Lcing.fanchenwendao.client.fx.ExampleExecutor;
-import net.Lcing.fanchenwendao.fashu.FashuData;
-import net.Lcing.fanchenwendao.fashu.FashuType;
+import net.Lcing.fanchenwendao.fashu.FaShuManager;
 import net.Lcing.fanchenwendao.gongfa.GongFaManager;
 import net.Lcing.fanchenwendao.jingjie.JingJieData;
-import net.Lcing.fanchenwendao.network.packet.SpawnBurstPayload;
-import net.Lcing.fanchenwendao.network.packet.SyncFashuPayload;
-import net.Lcing.fanchenwendao.network.packet.SyncGongFaPayload;
-import net.Lcing.fanchenwendao.network.packet.SyncJingJiePayload;
+import net.Lcing.fanchenwendao.network.packet.*;
 import net.Lcing.fanchenwendao.registry.ModAttachments;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -41,32 +37,6 @@ public class ClientPayloadHandler {
     }
 
 
-    //处理法术同步
-    public static void handleSyncFashu(final SyncFashuPayload payload, final IPayloadContext context) {
-
-        //enqueueWork 把任务排队到主线程
-        context.enqueueWork(() -> {
-            //客户端逻辑
-            //获取客户端世界
-            var level = Minecraft.getInstance().level;
-
-            if (level != null) {
-                //根据ID查找实体
-                Entity targetEntity = level.getEntity(payload.entityId());
-
-                //确保是玩家
-                if (targetEntity instanceof Player player) {
-                    //拿到客户端的法术数据
-                    FashuData data = player.getData(ModAttachments.FASHU_DATA);
-
-                    //同步客户端数据
-                    data.setCurrentFashu(FashuType.getById(payload.fashuId()));
-                }
-
-            }
-
-        });
-    }
 
 
     //处理境界同步
@@ -93,6 +63,28 @@ public class ClientPayloadHandler {
         //切回主线程执行（网络包在网络线程接收，不能直接操作游戏数据）
         context.enqueueWork(() -> {
             GongFaManager.syncFromServer(payload.gongfas());
+        });
+    }
+
+    //处理法术同步
+    public static void handleSyncFaShu(final SyncFaShuPayload payload, final IPayloadContext context) {
+
+        //enqueueWork 把任务排队到主线程
+        context.enqueueWork(() -> {
+            FaShuManager.syncFromServer(payload.fashus());  //调用Manager同步
+        });
+    }
+
+    //处理法术切换同步
+    public static void handleSelectFaShuSync(final SyncSelectFaShuPayload payload, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            var level = Minecraft.getInstance().level;
+            if (level != null) {
+                Entity entity = level.getEntity(payload.entityId());
+                if (entity instanceof Player player) {
+                    player.getData(ModAttachments.FASHU_DATA).setCurrentFaShuId(payload.fashuId());
+                }
+            }
         });
     }
 

@@ -2,11 +2,7 @@ package net.Lcing.fanchenwendao.registry;
 
 import net.Lcing.fanchenwendao.FanChenWenDao;
 import net.Lcing.fanchenwendao.client.handler.ClientPayloadHandler;
-import net.Lcing.fanchenwendao.network.packet.SpawnBurstPayload;
-import net.Lcing.fanchenwendao.network.packet.SyncFashuPayload;
-import net.Lcing.fanchenwendao.network.packet.SyncGongFaPayload;
-import net.Lcing.fanchenwendao.network.packet.SyncJingJiePayload;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.Lcing.fanchenwendao.network.packet.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -32,18 +28,18 @@ public class ModNetwork {
                 })
         );
 
-        //法术同步包
+        //法术数据同步包
         registrar.playToClient(
-                SyncFashuPayload.TYPE,
-                SyncFashuPayload.STREAM_CODEC,
+                SyncFaShuPayload.TYPE,
+                SyncFaShuPayload.STREAM_CODEC,
                 ((payload, context) -> {
                     if (FMLEnvironment.dist.isClient()) {
-                        net.Lcing.fanchenwendao.client.handler.ClientPayloadHandler.handleSyncFashu(payload, context);
+                        net.Lcing.fanchenwendao.client.handler.ClientPayloadHandler.handleSyncFaShu(payload, context);
                     }
                 })
         );
 
-        //境界同步包
+        //境界数据同步包
         registrar.playToClient(
                 SyncJingJiePayload.TYPE,
                 SyncJingJiePayload.STREAM_CODEC,
@@ -62,6 +58,18 @@ public class ModNetwork {
                     //只在客户端执行
                     if (FMLEnvironment.dist.isClient()) {
                         ClientPayloadHandler.handleSyncGongFa(payload, context);
+                    }
+                })
+        );
+
+        //法术切换同步包
+        registrar.playToClient(
+                SyncSelectFaShuPayload.TYPE,
+                SyncSelectFaShuPayload.STREAM_CODEC,
+                ((payload, context) -> {
+                    //只在客户端执行
+                    if (FMLEnvironment.dist.isClient()) {
+                        ClientPayloadHandler.handleSelectFaShuSync(payload, context);
                     }
                 })
         );

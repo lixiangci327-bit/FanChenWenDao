@@ -64,8 +64,8 @@ public class FanChenWenDaoClient {
 
     //渲染器注册
     private void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        //火球
-        event.registerEntityRenderer(ModEntities.FIREBALL_PROJECTILE.get(), NoopRenderer::new);
+        //法术通用实体
+        event.registerEntityRenderer(ModEntities.FASHU_PROJECTILE.get(), NoopRenderer::new);
 
         //离手剑
         event.registerEntityRenderer(ModEntities.THROWN_SWORD.get(), ThrownSwordRenderer::new);

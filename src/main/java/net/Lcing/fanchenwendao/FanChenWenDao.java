@@ -2,6 +2,8 @@ package net.Lcing.fanchenwendao;
 
 import net.Lcing.fanchenwendao.client.animation.FCAnimations;
 import net.Lcing.fanchenwendao.event.CommonEventHandler;
+import net.Lcing.fanchenwendao.fashu.FaShuManager;
+import net.Lcing.fanchenwendao.fashu.logic.FaShuLogics;
 import net.Lcing.fanchenwendao.gongfa.GongFaManager;
 import net.Lcing.fanchenwendao.registry.*;
 
@@ -58,6 +60,10 @@ public class FanChenWenDao {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
+        //逻辑注册放入线程安全的队列中
+        event.enqueueWork(() -> {
+            FaShuLogics.init();
+        });
 
     }
 
@@ -76,5 +82,6 @@ public class FanChenWenDao {
     @SubscribeEvent
     public void onAddReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new GongFaManager());
+        event.addListener(new FaShuManager());
     }
 }

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.Lcing.fanchenwendao.client.debug.EntityPoseDebugger;
 import net.Lcing.fanchenwendao.entity.ThrownSwordEntity;
-import net.Lcing.fanchenwendao.fashu.ningqi.ThrownSword;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;

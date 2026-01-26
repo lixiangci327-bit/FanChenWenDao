@@ -13,6 +13,7 @@ import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.attachment.IAttachmentSerializer;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -28,8 +29,19 @@ public class ModAttachments {
     public static final Supplier<AttachmentType<FashuData>> FASHU_DATA = ATTACHMENT_TYPES.register(
             "fashu_data",
             () -> AttachmentType.<FashuData>builder(() -> new FashuData())
-                    .serialize(FashuData.CODEC)
-                    .copyOnDeath()
+                    .serialize(new IAttachmentSerializer<CompoundTag, FashuData>() {
+                        @Override
+                        public FashuData read(IAttachmentHolder holder, CompoundTag tag, HolderLookup.Provider provider) {
+                            FashuData data = new FashuData();
+                            data.deserializeNBT(provider, tag);
+                            return data;
+                        }
+
+                        @Override
+                        public CompoundTag write(FashuData attachment, HolderLookup.Provider provider) {
+                            return attachment.serializeNBT(provider);
+                        }
+                    })
                     .build()
     );
 
