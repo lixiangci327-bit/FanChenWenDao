@@ -14,10 +14,12 @@ public class FaShuLogics {
 
     //预定义的逻辑
     public static final ResourceLocation PROJECTILE = ResourceLocation.parse("fanchenwendao:projectile");
+    public static final ResourceLocation INSTANT = ResourceLocation.parse("fanchenwendao:instant");
 
     //初始化注册
     public static void init() {
         register(PROJECTILE, new ProjectileSpellLogic());
+        register(INSTANT, new InstantSpellLogic());
     }
 
     //注册方法

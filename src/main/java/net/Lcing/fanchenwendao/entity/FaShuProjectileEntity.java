@@ -152,9 +152,9 @@ public class FaShuProjectileEntity extends ThrowableItemProjectile {
 
             // 拿到法术定义且有特效配置时
             if (define != null) {
-                if (define.getProjectileVisual() != null) {
+                if (define.getVisual("projectile") != null) {
                     // 读取特效id
-                    define.getProjectileVisual().fxID().ifPresent(fxID -> {
+                    define.getVisual("projectile").fxID().ifPresent(fxID -> {
                         FX fx = FXHelper.getFX(fxID);
                         if (fx != null) {
                             // 创建特效执行器并绑定到当前实体This

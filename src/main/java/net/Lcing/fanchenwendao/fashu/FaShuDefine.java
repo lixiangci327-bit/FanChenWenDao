@@ -29,16 +29,15 @@ public class FaShuDefine {
     private final ResourceLocation logicType;
     private final Map<String, String> logicParams;
 
-    //VFX
-    private final VisualConfig castVisual;  //玩家施法vfx
-    private final VisualConfig projectileVisual;    //飞行物特效
+    //VFX：Key-法术逻辑类型
+    private final Map<String, VisualConfig> visuals;
 
     //构造函数
     public FaShuDefine(
             ResourceLocation id, String name, String description,
             int cooldown, float cost, float damage,
             ResourceLocation logicType, Map<String, String> logicParams,
-            VisualConfig castVisual, VisualConfig projectileVisual
+            Map<String, VisualConfig> visuals
     ){
         this.id = id;
         this.name = name;
@@ -48,8 +47,7 @@ public class FaShuDefine {
         this.damage = damage;
         this.logicType = logicType;
         this.logicParams = logicParams;
-        this.castVisual = castVisual;
-        this.projectileVisual = projectileVisual;
+        this.visuals = visuals;
     }
 
     //Getter
@@ -61,8 +59,7 @@ public class FaShuDefine {
     public float getDamage() { return damage;  }
     public ResourceLocation getLogicType() { return logicType;  }
     public Map<String, String> getLogicParams() { return logicParams;  }
-    public VisualConfig getCastVisual() { return castVisual; }
-    public VisualConfig getProjectileVisual() { return projectileVisual; }
+    public Map<String, VisualConfig> getVisuals() { return visuals;  }
 
     //Helper：从Map中读取数值
     public String getParam(String key, String defaultValue) {
@@ -95,6 +92,12 @@ public class FaShuDefine {
         return Boolean.parseBoolean(val);
     }
 
+    //获取指定阶段的视觉配置
+    public VisualConfig getVisual(String phase) {
+        return visuals.getOrDefault(phase, VisualConfig.EMPTY);
+    }
+
+
 
 
     //Codec
@@ -107,14 +110,15 @@ public class FaShuDefine {
             Codec.FLOAT.optionalFieldOf("damage", 1.0f).forGetter(FaShuDefine::getDamage),
             ResourceLocation.CODEC.fieldOf("logic_type").forGetter(FaShuDefine::getLogicType),
             Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("logic_params", new HashMap<>()).forGetter(FaShuDefine::getLogicParams),
-            VisualConfig.CODEC.optionalFieldOf("cast_visual", VisualConfig.EMPTY).forGetter(FaShuDefine::getCastVisual),
-            VisualConfig.CODEC.optionalFieldOf("projectile_visual", VisualConfig.EMPTY).forGetter(FaShuDefine::getProjectileVisual)
+            Codec.unboundedMap(Codec.STRING, VisualConfig.CODEC).optionalFieldOf("visuals", new HashMap<>()).forGetter(FaShuDefine::getVisuals)
     ).apply(instance, FaShuDefine::new));
 
 
     //定义Map的StreamCodec常量
     private static final StreamCodec<FriendlyByteBuf, Map<String, String>> MAP_STREAM_CODEC =
             ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.STRING_UTF8);
+    private static final StreamCodec<FriendlyByteBuf, Map<String, VisualConfig>> VISUALS_STREAM_CODEC =
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, VisualConfig.STREAM_CODEC);
 
     //StreamCodec
     public static final StreamCodec<FriendlyByteBuf, FaShuDefine> STREAM_CODEC = StreamCodec.of(
@@ -127,8 +131,7 @@ public class FaShuDefine {
                 ByteBufCodecs.FLOAT.encode(buf, val.damage);
                 ResourceLocation.STREAM_CODEC.encode(buf, val.logicType);
                 MAP_STREAM_CODEC.encode(buf, val.logicParams);
-                VisualConfig.STREAM_CODEC.encode(buf, val.castVisual);
-                VisualConfig.STREAM_CODEC.encode(buf, val.projectileVisual);
+                VISUALS_STREAM_CODEC.encode(buf, val.visuals);
             },
             (buf) -> new FaShuDefine(
                     ResourceLocation.STREAM_CODEC.decode(buf),
@@ -138,9 +141,8 @@ public class FaShuDefine {
                     ByteBufCodecs.FLOAT.decode(buf),
                     ByteBufCodecs.FLOAT.decode(buf),
                     ResourceLocation.STREAM_CODEC.decode(buf),
-                    ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.STRING_UTF8).decode(buf),
-                    VisualConfig.STREAM_CODEC.decode(buf),
-                    VisualConfig.STREAM_CODEC.decode(buf)
+                    MAP_STREAM_CODEC.decode(buf),
+                    VISUALS_STREAM_CODEC.decode(buf)
             )
     );
 }

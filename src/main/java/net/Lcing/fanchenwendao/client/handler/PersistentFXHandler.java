@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+//持续性特效控制器
 @EventBusSubscriber(modid = FanChenWenDao.MODID, value = Dist.CLIENT)
 public class PersistentFXHandler {
 

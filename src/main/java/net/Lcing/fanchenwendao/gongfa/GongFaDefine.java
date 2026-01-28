@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 public class GongFaDefine {
 
     //功法基础信息
-    private final ResourceLocation id;  //id
+    private final ResourceLocation id;  //功法ID
     private final String name;  //功法名称
     private final String description;   //功法描述
     private final String attribute; //属性（水，火）

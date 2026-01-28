@@ -88,4 +88,28 @@ public class ClientPayloadHandler {
         });
     }
 
+    //处理瞬发特效
+    public static void handleInstantFX(final SpawnInstantFXPayload payload, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            var level = Minecraft.getInstance().level;
+            if (level != null) {
+
+                //System.out.println("DEBUG: Client received FX packet. ID=" + payload.fxId() + " Pos=" + payload.x() + "," + payload.y() + "," + payload.z());
+
+                FX fx = FXHelper.getFX(payload.fxId()); //获取特效ID
+                if (fx != null) {
+                    ExampleExecutor executor = new ExampleExecutor(fx, level);
+
+                    //设置位置
+                    executor.emit();    //播放特效
+                    executor.setPosition(payload.x(), payload.y(), payload.z());
+
+                    //System.out.println("DEBUG: FX resource found, emitting...");
+                } else {
+                    System.err.println("找不到特效 ID: " + payload.fxId());
+                }
+            }
+        });
+    }
+
 }

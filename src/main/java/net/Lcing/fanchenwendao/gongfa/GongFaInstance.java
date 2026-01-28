@@ -78,7 +78,7 @@ public class GongFaInstance {
     //DEBUG
     @Override
     public String toString() {
-        return "GongFaInstance{id=" + gongfaID + ", layer=" + layer + ", mastery=" + mastery + "}";
+        return "GongFaInstance{fxID=" + gongfaID + ", layer=" + layer + ", mastery=" + mastery + "}";
     }
 
 

@@ -74,6 +74,18 @@ public class ModNetwork {
                 })
         );
 
+        //瞬发特效数据包
+        registrar.playToClient(
+                SpawnInstantFXPayload.TYPE,
+                SpawnInstantFXPayload.STREAM_CODEC,
+                ((payload, context) -> {
+                    //只在客户端执行
+                    if (FMLEnvironment.dist.isClient()) {
+                        ClientPayloadHandler.handleInstantFX(payload, context);
+                    }
+                })
+        );
+
         FanChenWenDao.LOGGER.info("网络数据包注册完成 (Network payloads registered)");
     }
 
