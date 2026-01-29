@@ -137,8 +137,21 @@ public class FaShuProjectileEntity extends ThrowableItemProjectile {
 
             }
         }
+
+        //飞行轨迹处理
+        if (!this.level().isClientSide) {
+            FaShuDefine define = getDefine();
+            if (define != null) {
+                //读取轨迹参数
+                String trajectory = define.getParam("trajectory", "straight");
+                if (!"straight".equals(trajectory)) {
+                    handleTrajectory(trajectory);
+                }
+            }
+        }
         // 调用父类tick处理物理运动
         super.tick();
+
 
         // 实体寿命检查，服务端负责销毁
         if (!this.level().isClientSide() && this.tickCount > lifetime) {
@@ -270,4 +283,40 @@ public class FaShuProjectileEntity extends ThrowableItemProjectile {
             this.entityData.set(FASHU_ID, compound.getString("FaShuId"));
         }
     }
+
+
+    //轨迹计算方法
+    private void handleTrajectory(String type) {
+        Vec3 currentVel = this.getDeltaMovement();
+        double speed = currentVel.length();
+
+        //速度太慢不处理
+        if (speed < 0.01) return;
+
+        //构建局部坐标系
+        Vec3 forward = currentVel.normalize();
+        Vec3 upRef = new Vec3(0, 1, 0);
+        Vec3 right = forward.cross(upRef);
+        if (right.lengthSqr() < 1.0E-4D) right = new Vec3(1, 0, 0);
+        right = right.normalize();
+        Vec3 realUp = right.cross(forward).normalize();
+
+        //时间变量
+        double t = this.tickCount;
+        Vec3 offsetVel = Vec3.ZERO;
+
+        switch (type) {
+            case "wave":
+                double wave = Math.sin(t * 0.5) * 0.05;
+                offsetVel = realUp.scale(wave);
+                break;
+        }
+
+        //应用新方向
+        Vec3 newDir = forward.add(offsetVel).normalize();
+        this.setDeltaMovement(newDir.scale(speed));
+
+        this.hasImpulse = true;
+    }
+
 }
